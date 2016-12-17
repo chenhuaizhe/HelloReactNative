@@ -13,15 +13,33 @@ export default class WeatherMain extends Component {
 		super(props)
 		this.state = {
 			zip:'',
-			forecast:{
-				main:'Sunny',
-				description:'very good',
-				temp:10
-			}
-		}
+			forecast:null
+		};
+
+		fetch('http://wthrcdn.etouch.cn/weather_mini?citykey=101010100')
+    		.then((res) => {
+    			return res.json()
+   			 })
+    		.then((responseJSON) => {
+        		this.setState({
+        			forecast: {
+       				 main: responseJSON.data.forecast[0].type,
+          			description: responseJSON.data.ganmao,
+          			temp: responseJSON.data.wendu,
+        			}
+     			});
+   			 })
+    	.catch((error) => {
+     		 console.warn(error);
+    	})
+
 	}
 
 	render () {
+		var content = null;
+		if (this.state.forecast !== null) {
+			content = <Forecast main={this.state.forecast.main} description={this.state.forecast.description } temp ={this.state.forecast.temp}/>;
+		}
 		return (
 			// <Image source={require("./background.jpg")} resizeMode='cover' style={styles.background}>
 				<View style={styles.container}>
@@ -29,7 +47,7 @@ export default class WeatherMain extends Component {
 					地区的邮政编码是:{this.state.zip}
 					</Text>
 					<TextInput style={styles.input} onSubmitEditing={(event)=>this._handleInputTextDidChanged(event)}/>
-					<Forecast main={this.state.forecast.main} description={this.state.forecast.description} temp={this.state.forecast.temp}/>
+					{content}
 				</View>
 			// </Image>
 
@@ -39,6 +57,16 @@ export default class WeatherMain extends Component {
 	_handleInputTextDidChanged(event) {
 		this.setState({zip: event.nativeEvent.text});
     }
+
+    // fetch('http://wthrcdn.etouch.cn/weather_mini?citykey=101010100')
+    // 	.then((response) => response.json())
+    // 	.then((responseJson)) => {
+
+    // 	}
+    // 	.catch((eror)) => {
+
+    // 	})
+
 }
 
 const styles = StyleSheet.create({
